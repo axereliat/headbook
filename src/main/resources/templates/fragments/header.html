@@ -1,0 +1,61 @@
+<nav class="navbar navbar-expand-lg navbar-light static-top sb-navbar">
+    <div class="container">
+        <a class="navbar-brand" href="/">HeadBook</a>
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
+                data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
+                aria-label="Toggle navigation">
+            Menu
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="dropdownThemes" data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false">Themes</a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownThemes">
+                        <a class="dropdown-item" href="/template-categories/all">
+                            <i class="fal fa-browser fa-fw"></i>
+                            All Templates &amp; Themes</a>
+                        <a class="dropdown-item" href="/template-categories/popular">
+                            <i class="fal fa-star fa-fw"></i>
+                            Most Popular</a>
+                    </div>
+                </li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a class="nav-link" th:href="@{/profile/{id}(id=${currentUser.id})}">Profile</a>
+                </li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a class="nav-link" href="/friendRequests">Friend Requests <span class="badge badge-light" th:text="${friendRequests.size()}"></span></a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="dropdownResources" data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false">Resources</a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownResources">
+                        <a class="dropdown-item" href="/bootstrap-resources">
+                            <i class="fal fa-th-list fa-fw"></i>
+                            Bootstrap Resources List</a>
+                        <a class="dropdown-item" href="/help">
+                            <i class="fal fa-life-ring fa-fw"></i>
+                            Help &amp; FAQ</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/" title="Contact Start Bootstrap">Contact</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a class="nav-link">
+                        <img th:src="${currentUser.avatar}" width="15%" height="15%" class="" alt="avatar">
+                        <span th:text="${currentUser.getFullName()}"></span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout" sec:authorize="isAuthenticated()">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

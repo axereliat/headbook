@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<th:block th:include="fragments/head"></th:block>
+
+<body>
+<th:block th:include="fragments/header"></th:block>
+<header class="page-heading">
+    <div class="container">
+        <h1>Your Friend Requests</h1>
+    </div>
+</header>
+<div class="jumbotron">
+    <!--/*@thymesVar id="friendRequests" type="com.headbook.domain.entities.User[]"*/-->
+    <th:block th:each="friendRequest : ${friendRequests}">
+        <div th:id="|request-${friendRequest.getId()}|">
+            <img th:src="${friendRequest.getAvatar()}" class="img-thumbnail img-fluid" alt="avatar">
+            <a th:href="@{/profile/{id}(id=${friendRequest.getId()})}">
+                <strong th:text="${friendRequest.getUsername()}"></strong>
+            </a>
+            <button th:id="|accept-${friendRequest.id}|" class="acceptBtn btn btn-info"><i class="fa fa-handshake" style="font-size: 15mm"></i> Accept</button>
+            <button th:id="|decline-${friendRequest.id}|" class="declineBtn btn btn-danger"><i class="fa fa-ban" style="font-size: 15mm"></i> Decline</button>
+            <strong style="color: green" th:id="|appender-${friendRequest.id}|"></strong>
+            <span></span>
+        </div>
+    </th:block>
+</div>
+
+<th:block th:include="fragments/footer"></th:block>
+
+</body>
+</html>
+
+<script>
+    $('.declineBtn').on('click', function (e) {
+        e.preventDefault();
+        // var id = $(this).attr('id').substr($(this).attr('id').indexOf('-') + 1, $(this).attr('id').length);
+        var id = $(this).attr('id').split('-')[1];
+        //$('div#request-' + id).fadeOut();
+        $.ajax({
+            url: '/decline?userId=' + id,
+            type: 'GET',
+            success: function (res) {
+                $('#decline-' + id).remove();
+                $('#accept-' + id).remove();
+                $('#appender-' + id).css('color', 'red');
+                $('#appender-' + id).html('Request declined.');
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        })
+    });
+
+    $('.acceptBtn').on('click', function (e) {
+        e.preventDefault();
+        var id = $(this).attr('id').substr($(this).attr('id').indexOf('-') + 1, $(this).attr('id').length);
+        //$('div#request-' + id).fadeOut();
+        $.ajax({
+            url: '/accept?userId=' + id,
+            type: 'GET',
+            success: function (res) {
+                $('#decline-' + id).remove();
+                $('#accept-' + id).remove();
+                $('#appender-' + id).css('color', 'green');
+                $('#appender-' + id).html('You are now friends!');
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        })
+    });
+</script>

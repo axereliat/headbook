@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<th:block th:include="fragments/head"></th:block>
+
+<body>
+<th:block th:include="fragments/header"></th:block>
+
+<div class="jumbotron">
+    <h1 class="text-center">401 Access Denied</h1>
+    <p>You do not have permissions to access this page</p>
+    <a href="/">Go to home page</a>
+</div>
+
+<th:block th:include="fragments/footer"></th:block>
+</body>
+</html>

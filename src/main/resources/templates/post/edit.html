@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<th:block th:include="fragments/head"></th:block>
+
+<body>
+<th:block th:include="fragments/header"></th:block>
+<header class="page-heading">
+    <div class="container">
+        <h1>Edit Post</h1>
+    </div>
+</header>
+
+<div class="jumbotron">
+    <form th:action="@{/posts/edit/{id}(id=${post.id})}" method="post" enctype="multipart/form-data" id="my-drop-zone"
+          class="dropzone">
+        <div class="form-group">
+            <label for="description">Description: </label>
+            <textarea class="form-control" rows="6" id="description" placeholder="Description..."
+                      name="description" required th:text="${post.description}"></textarea>
+        </div>
+        <div class="fallback" id="dropzone">
+            <input name="file[]" type="file" multiple="multiple"/>
+        </div>
+        <input type="submit" value="Create" class="btn btn-primary float-right"/>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    </form>
+</div>
+
+<th:block th:include="fragments/footer"></th:block>
+</body>
+<script>
+    Dropzone.autoDiscover = false;
+    jQuery(document).ready(function () {
+        var myDropzone = new Dropzone("#my-drop-zone", {
+            url: $('#my-drop-zone').attr('action'),
+            paramName: 'file',
+            maxFilesize: 5, // MB
+            autoProcessQueue: false,
+            addRemoveLinks: true,
+            parallelUploads: 10,
+            uploadMultiple: true,
+            acceptedFiles: 'image/jpg, image/jpeg, image/png',
+            dictDefaultMessage: "Drag your new photos"
+        });
+        myDropzone.on('success', myDropzone.processQueue.bind(myDropzone));
+        $('#my-drop-zone').on('submit', function (e) {
+            if (myDropzone.getQueuedFiles().length > 0) {
+                e.preventDefault();
+                myDropzone.processQueue();
+            }
+
+            toastr.success('Your post is created!', 'Success');
+            window.setTimeout(function () {
+                window.location = '/';
+            }, 1000);
+        });
+    });
+</script>
+</html>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<th:block th:include="fragments/head"></th:block>
+
+<body>
+<th:block th:include="fragments/header"></th:block>
+<header class="page-heading">
+    <div class="container">
+        <h1 th:text="|${user.getFullName()}'s profile|"></h1>
+    </div>
+</header>
+
+<style>
+    .jssora053 {display:block;position:absolute;cursor:pointer;}
+    .jssora053 .a {fill:none;stroke:#fff;stroke-width:640;stroke-miterlimit:10;}
+    .jssora053:hover {opacity:.8;}
+    .jssora053.jssora053dn {opacity:.5;}
+    .jssora053.jssora053ds {opacity:.3;pointer-events:none;}
+</style>
+
+<div class="jumbotron">
+    <div class="row">
+        <div class="col-md-6">
+            <h3 th:text="${user.getFullName()}"></h3>
+            <img th:src="${user.avatar}" width="30%" height="30%" class="img-thumbnail img-fluid" alt="">
+            <form th:action="@{/avatarUpload}" method="post" enctype="multipart/form-data">
+                Change Avatar:
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" name="avatar" id="avatar" accept="image/png, image/jpeg, image/jpg" required>
+                    <label class="custom-file-label" for="avatar">Choose image</label>
+                </div>
+                <div class="input-group-append">
+                    <input type="submit" class="btn btn-primary" value="Upload">
+                </div>
+            </form>
+            <!--/*@thymesVar id="currentUser" type="com.headbook.domain.entities.User"*/-->
+            <th:block th:if="${user.getId() != currentUser.getId()}">
+                <button id="addFriendBtn" class="btn btn-info" th:if="${relationship == null}"><i class="fa fa-handshake" style="font-size: 15mm"></i> Add Friend</button>
+                <span id="appender"></span>
+                <th:block th:if="${relationship != null}">
+                    <button id="cancelBtn" class="btn btn-warning" th:if="${relationship.getStatus().toString().equals('PENDING') && relationship.actionUser.equals(currentUser.id)}"><i class="fa fa-ban" style="font-size: 15mm"></i> Cancel</button>
+                    <button id="acceptBtn" class="btn btn-info" th:if="${relationship.getStatus().toString().equals('PENDING') && !relationship.actionUser.equals(currentUser.id)}"><i class="fa fa-handshake" style="font-size: 15mm"></i> Accept</button>
+                    <button id="declineBtn" class="btn btn-danger" th:if="${relationship.getStatus().toString().equals('PENDING') && !relationship.actionUser.equals(currentUser.id)}"><i class="fa fa-ban" style="font-size: 15mm"></i> Decline</button>
+                    <button id="unfriendBtn" class="btn btn-info" th:if="${relationship.getStatus().toString().equals('ACCEPTED')}"><i class="fa fa-ban" style="font-size: 15mm"></i> Unfriend</button>
+                </th:block>
+            </th:block>
+        </div>
+    </div>
+
+    <h3 class="text-center">Posts</h3>
+    <hr/>
+    <th:block th:each="post : ${user.posts}">
+        <img th:src="${post.getAuthor().getAvatar()}" width="10%" height="10%" alt="">
+        <a th:href="@{/profile/{id}(id=${post.getAuthor().getId()})}"><strong th:text="${post.getAuthor().getFullName()}"></strong></a>
+        <p th:text="${post.description}"></p>
+        <th:block th:if="${post.getPhotos().size() > 0}">
+            <div class="jssor_item" th:id="|post_${post.id}|" style="position:relative;top:0px;left:0px;width:980px;height:380px;overflow:hidden;">
+                <div data-u="slides" style="cursor:default;position:relative;top:0px;left:0px;width:980px;height:380px;overflow:hidden;">
+                    <th:block th:each="photo : ${post.photos}">
+                        <div>
+                            <img data-u="image" th:src="${photo.url}" />
+                            <div data-ts="flat" data-p="1360" style="position:absolute;top:0px;left:0px;width:980px;height:380px;overflow:hidden;">
+                                <div data-u="caption" data-t="1" style="position:absolute;top:-50px;left:125px;width:500px;height:40px;font-family:Oswald,sans-serif;font-size:32px;font-weight:200;line-height:1.2;text-align:center;background-color:rgba(255,188,5,0.8);">Time lined layer animation</div>
+                            </div>
+                        </div>
+                    </th:block>
+                </div>
+                <th:block th:if="${post.photos.size() > 1}">
+                    <div data-u="arrowleft" class="jssora053" style="width:55px;height:55px;top:0px;left:25px;" data-autocenter="2" data-scale="0.75" data-scale-left="0.75">
+                        <svg viewBox="0 0 16000 16000" style="position:absolute;top:0;left:0;width:100%;height:100%;">
+                            <polyline class="a" points="11040,1920 4960,8000 11040,14080 "></polyline>
+                        </svg>
+                    </div>
+                    <div data-u="arrowright" class="jssora053" style="width:55px;height:55px;top:0px;right:25px;" data-autocenter="2" data-scale="0.75" data-scale-right="0.75">
+                        <svg viewBox="0 0 16000 16000" style="position:absolute;top:0;left:0;width:100%;height:100%;">
+                            <polyline class="a" points="4960,1920 11040,8000 4960,14080 "></polyline>
+                        </svg>
+                    </div>
+                </th:block>
+            </div>
+        </th:block>
+        <hr/>
+    </th:block>
+</div>
+
+<th:block th:include="fragments/footer"></th:block>
+</body>
+
+<script>
+    jQuery(document).ready(function ($) {
+        var options = {
+            $ArrowNavigatorOptions: {
+                $Class: $JssorArrowNavigator$
+            }
+        };
+
+
+        //Scale slider while window load/resize/orientationchange.
+        $(window).bind("load", initSliders);
+        $(window).bind("resize", initSliders);
+        $(window).bind("orientationchange", initSliders);
+
+
+        function initSliders(e) {
+
+            console.log(e.type);
+
+            $('.jssor_item').each(function () {
+                try {
+                    console.log($(this).find('img').length);
+                    var _self = $(this);
+                    if (_self.find('img').length > 1) {
+                        var elemId = _self.attr('id');
+                        var jssorSlider = new $JssorSlider$(elemId, options);
+                        ScaleSlider(elemId, jssorSlider);
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            })
+        }
+
+        //responsive code begin
+        //remove responsive code if you don't want the slider scales
+        //while window resizing
+        function ScaleSlider(id, jssorSlider) {
+            try {
+                var _parent = $('#' + id).parent()
+                var parentWidth = _parent.width();
+                if (parentWidth) {
+                    jssorSlider.$ScaleWidth(parentWidth);
+                } else {
+                    window.setTimeout(ScaleSlider, 30);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+
+        }
+        //Scale slider after document ready
+        // ScaleSlider();
+
+        //Scale slider while window load/resize/orientationchange.
+        $(window).bind("load", ScaleSlider);
+        $(window).bind("resize", ScaleSlider);
+        $(window).bind("orientationchange", ScaleSlider);
+        //responsive code end
+    });
+</script>
+
+<script th:inline="javascript">
+    var userId = /*[[${userId}]]*/ null;
+
+    $('#addFriendBtn').on('click', function (e) {
+        e.preventDefault();
+        $.ajax({
+            url: '/addFriend?userId=' + userId,
+            type: 'GET',
+            success: function (res) {
+                $('#addFriendBtn').remove();
+                $('#appender').append('<button id="cancelBtn" class="btn btn-warning"><i class="fa fa-ban" style="font-size: 15mm"></i> Cancel</button>')
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        })
+    });
+    $('#appender').on('click', '#addFriendBtn', function (e) {
+        e.preventDefault();
+        $.ajax({
+            url: '/addFriend?userId=' + userId,
+            type: 'GET',
+            success: function (res) {
+                $('#addFriendBtn').remove();
+                $('#appender').append('<button id="cancelBtn" class="btn btn-warning"><i class="fa fa-ban" style="font-size: 15mm"></i> Cancel</button>')
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        })
+    });
+    $('#cancelBtn').on('click', function (e) {
+        e.preventDefault();
+        $.ajax({
+            url: '/cancel?userId=' + userId,
+            type: 'GET',
+            success: function (res) {
+                $('#cancelBtn').remove();
+                $('#appender').append('<button id="addFriendBtn" class="btn btn-info"><i class="fa fa-handshake" style="font-size: 15mm"></i> Add Friend</button>')
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        })
+    });
+    $('#appender').on('click', '#cancelBtn', function(e){
+        e.preventDefault();
+        $.ajax({
+            url: '/cancel?userId=' + userId,
+            type: 'GET',
+            success: function (res) {
+                $('#cancelBtn').remove();
+                $('#appender').append('<button id="addFriendBtn" class="btn btn-info"><i class="fa fa-handshake" style="font-size: 15mm"></i> Add Friend</button>')
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        })
+    });
+    $('#declineBtn').on('click', function (e) {
+        e.preventDefault();
+        $.ajax({
+            url: '/decline?userId=' + userId,
+            type: 'GET',
+            success: function (res) {
+                $('#declineBtn').remove();
+                $('#acceptBtn').remove();
+                $('#appender').append('<button id="addFriendBtn" class="btn btn-info"><i class="fa fa-handshake" style="font-size: 15mm"></i> Add Friend</button>')
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        })
+    });
+    $('#acceptBtn').on('click', function (e) {
+        e.preventDefault();
+        $.ajax({
+            url: '/accept?userId=' + userId,
+            type: 'GET',
+            success: function (res) {
+                $('#acceptBtn').remove();
+                $('#declineBtn').remove();
+                $('#appender').append('<button id="unfriendBtn" class="btn btn-info"><i class="fa fa-ban" style="font-size: 15mm"></i> Unfriend</button>')
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        })
+    });
+    $('#unfriendBtn').on('click', function (e) {
+        e.preventDefault();
+        $.ajax({
+            url: '/unfriend?userId=' + userId,
+            type: 'GET',
+            success: function (res) {
+                $('#unfriendBtn').remove();
+                $('#appender').append('<button id="addFriendBtn" class="btn btn-info"><i class="fa fa-handshake" style="font-size: 15mm"></i> Add Friend</button>')
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        })
+    });
+    $('#appender').on('click', '#unfriendBtn', function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: '/unfriend?userId=' + userId,
+            type: 'GET',
+            success: function (res) {
+                $('#unfriendBtn').remove();
+                $('#appender').append('<button id="addFriendBtn" class="btn btn-info"><i class="fa fa-handshake" style="font-size: 15mm"></i> Add Friend</button>')
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        })
+    });
+</script>
+</html>

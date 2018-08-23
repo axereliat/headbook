@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<th:block th:include="fragments/head"></th:block>
+
+<body>
+<th:block th:include="fragments/header"></th:block>
+<header class="page-heading">
+    <div class="container">
+        <h1>HeadBook is a simple social-media website</h1>
+        <p><a style="color: white;" href="" data-toggle="modal" data-target="#loginModal">Login</a> if you have an account or <a style="color: white;" href="" data-toggle="modal" data-target="#registerModal">register</a> if you don't</p>
+    </div>
+</header>
+
+<div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Register</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form th:action="@{/register}" id="registerForm" method="post">
+                    <div class="form-group">
+                        <label class="custom-control-label" for="email">Email: </label>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="Email..."/>
+                    </div>
+                    <div class="form-group">
+                        <label class="custom-control-label" for="firstName">First name: </label>
+                        <input type="text" id="firstName" name="firstName" class="form-control" placeholder="First name..."/>
+                    </div>
+                    <div class="form-group">
+                        <label class="custom-control-label" for="lastName">Last name: </label>
+                        <input type="text" id="lastName" name="lastName" class="form-control" placeholder="Last name..."/>
+                    </div>
+                    <div class="form-group">
+                        <label class="custom-control-label" for="password">Password: </label>
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Password..."/>
+                    </div>
+                    <div class="form-group">
+                        <label class="custom-control-label" for="confirmPassword">Confirm password: </label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="Confirm password..."/>
+                    </div>
+                    <input type="submit" value="Register" class="btn btn-primary float-right" />
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loginModalLabel">Login</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form th:action="@{/login}" id="loginForm" method="post">
+                    <div class="form-group">
+                        <label class="custom-control-label" for="emailLogin">Email: </label>
+                        <input type="email" id="emailLogin" name="email" class="form-control" placeholder="Email..."/>
+                    </div>
+                    <div class="form-group">
+                        <label class="custom-control-label" for="passwordLogin">Password: </label>
+                        <input type="password" id="passwordLogin" name="password" class="form-control" placeholder="Password..."/>
+                    </div>
+                    <input type="submit" value="Login" class="btn btn-primary float-right" />
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function(){
+        $('#registerForm').on('submit', function(e){
+            e.preventDefault();
+            $.ajax({
+                url: '/register',
+                type: 'POST',
+                data: $('#registerForm').serialize(),
+                success: function(data){
+                    if (data.error === '') {
+                        toastr.success('Successfully registered', "Success");
+                        window.setTimeout(function () {
+                            window.location = '/';
+                        }, 2000);
+                    } else {
+                        toastr.error(data.error, 'Error');
+                    }
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            });
+        });
+    });
+</script>
+
+<th:block th:include="fragments/footer"></th:block>
+</body>
+</html>
